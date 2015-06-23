@@ -82,21 +82,21 @@ private:
 		virtual bool saveSettings(){return true;}
 		void updateMinMaxAccelCalibration(geometry_msgs::Vector3 &min, geometry_msgs::Vector3 &max)
 		{
-			this->m_compassCalMin.setX(min.x);
-			this->m_compassCalMin.setY(min.y);
-			this->m_compassCalMin.setZ(min.z);
-			this->m_compassCalMax.setX(max.x);
-			this->m_compassCalMax.setY(max.y);
-			this->m_compassCalMax.setZ(max.z);
+			this->m_compassCalMin.setX((RTFLOAT)min.x);
+			this->m_compassCalMin.setY((RTFLOAT)min.y);
+			this->m_compassCalMin.setZ((RTFLOAT)min.z);
+			this->m_compassCalMax.setX((RTFLOAT)max.x);
+			this->m_compassCalMax.setY((RTFLOAT)max.y);
+			this->m_compassCalMax.setZ((RTFLOAT)max.z);
 		}
 		void updateMinMaxCompassCalibration(geometry_msgs::Vector3 &min, geometry_msgs::Vector3 &max)
 		{
-			this->m_accelCalMin.setX(min.x);
-			this->m_accelCalMin.setY(min.y);
-			this->m_accelCalMin.setZ(min.z);
-			this->m_accelCalMax.setX(max.x);
-			this->m_accelCalMax.setY(max.y);
-			this->m_accelCalMax.setZ(max.z);
+			this->m_accelCalMin.setX((RTFLOAT)min.x);
+			this->m_accelCalMin.setY((RTFLOAT)min.y);
+			this->m_accelCalMin.setZ((RTFLOAT)min.z);
+			this->m_accelCalMax.setX((RTFLOAT)max.x);
+			this->m_accelCalMax.setY((RTFLOAT)max.y);
+			this->m_accelCalMax.setZ((RTFLOAT)max.z);
 		}
 	private:
 		ros::NodeHandle* settings_nh_;
