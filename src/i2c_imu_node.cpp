@@ -371,7 +371,7 @@ bool I2cImu::updateAccelCalibration(i2c_imu::SetCalibration::Request &req,
 		                            i2c_imu::SetCalibrationResponse &resp)
 {
 	imu_settings_.updateMinMaxAccelCalibration(req.min,req.max);
-	imu_->resetFusion();
+	imu_->setCalibrationData();
 	return true;
 }
 
@@ -379,6 +379,7 @@ bool I2cImu::updateCompassCalibration(i2c_imu::SetCalibration::Request &req,
 									  i2c_imu::SetCalibrationResponse &resp)
 {
 	imu_settings_.updateMinMaxCompassCalibration(req.min,req.max);
+	imu_->setCalibrationData();
 	return true;
 }
 
