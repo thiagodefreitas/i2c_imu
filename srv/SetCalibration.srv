@@ -1,0 +1,9 @@
+#Data for the sensor calibration (3 Axis)
+geometry_msgs/Vector3 min
+geometry_msgs/Vector3 max
+
+---
+uint8 SUCCESS=0
+uint8 FAILURE=1
+
+uint8 status

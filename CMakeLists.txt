@@ -5,7 +5,10 @@ project(i2c_imu)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  std_srvs
+  geometry_msgs
   sensor_msgs
+  message_generation
   roscpp
   tf
 )
@@ -51,11 +54,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(DIRECTORY srv
+  FILES
+  SetCalibration.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -65,10 +67,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   sensor_msgs
-# )
+generate_messages(
+   DEPENDENCIES
+   geometry_msgs
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -82,7 +84,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
   LIBRARIES rtimu
-  CATKIN_DEPENDS sensor_msgs roscpp tf
+  CATKIN_DEPENDS geometry_msgs sensor_msgs roscpp tf message_runtime std_srvs
 #  DEPENDS system_lib
 )
 
@@ -99,6 +101,7 @@ include_directories(
 
 ## Declare a cpp executable
 add_executable(i2c_imu_node src/i2c_imu_node.cpp)
+add_dependencies(i2c_imu_node i2c_imu_generate_messages_cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes

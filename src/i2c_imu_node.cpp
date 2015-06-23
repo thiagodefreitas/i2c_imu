@@ -21,6 +21,9 @@
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/MagneticField.h>
 #include <angles/angles.h>
+#include <geometry_msgs/Vector3.h>
+#include <i2c_imu/SetCalibration.h>
+#include <std_srvs/Empty.h>
 
 #include "RTIMULib.h"
 #include "RTIMUSettings.h"
@@ -35,6 +38,13 @@ public:
 
 	void update();
 	void spin();
+	bool updateAccelCalibration(i2c_imu::SetCalibration::Request &req, i2c_imu::SetCalibrationResponse &resp);
+	bool updateCompassCalibration(i2c_imu::SetCalibration::Request &req, i2c_imu::SetCalibrationResponse &resp);
+	bool disableCompassCalibrationMode(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp);
+	bool disableAccelCalibrationMode(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp);
+	bool enableCompassCalibrationMode(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp);
+	bool enableAccelCalibrationMode(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp);
+
 
 private:
 	//ROS Stuff
@@ -48,6 +58,13 @@ private:
 	ros::Publisher imu_pub_;
 	ros::Publisher magnetometer_pub_;
 	ros::Publisher euler_pub_;
+
+	ros::ServiceServer disable_accel_cal_srv_;
+	ros::ServiceServer disable_compass_cal_srv_;
+	ros::ServiceServer enable_accel_cal_srv_;
+	ros::ServiceServer enable_compass_cal_srv_;
+	ros::ServiceServer set_compass_cal_;
+	ros::ServiceServer set_accel_cal_;
 
 	std::string imu_frame_id_;
 
@@ -63,6 +80,24 @@ private:
 		ImuSettings(ros::NodeHandle* nh) : settings_nh_(nh){setDefaults();}
 		virtual bool loadSettings();
 		virtual bool saveSettings(){return true;}
+		void updateMinMaxAccelCalibration(geometry_msgs::Vector3 &min, geometry_msgs::Vector3 &max)
+		{
+			this->m_compassCalMin.setX(min.x);
+			this->m_compassCalMin.setY(min.y);
+			this->m_compassCalMin.setZ(min.z);
+			this->m_compassCalMax.setX(max.x);
+			this->m_compassCalMax.setY(max.y);
+			this->m_compassCalMax.setZ(max.z);
+		}
+		void updateMinMaxCompassCalibration(geometry_msgs::Vector3 &min, geometry_msgs::Vector3 &max)
+		{
+			this->m_accelCalMin.setX(min.x);
+			this->m_accelCalMin.setY(min.y);
+			this->m_accelCalMin.setZ(min.z);
+			this->m_accelCalMax.setX(max.x);
+			this->m_accelCalMax.setY(max.y);
+			this->m_accelCalMax.setZ(max.z);
+		}
 	private:
 		ros::NodeHandle* settings_nh_;
 
@@ -77,6 +112,16 @@ I2cImu::I2cImu() :
 	private_nh_.param<std::string>("frame_id", imu_frame_id_, "imu_link");
 
 	imu_pub_ = nh_.advertise<sensor_msgs::Imu>("data",10);
+
+	disable_accel_cal_srv_=nh_.advertiseService("disable_accel_cal", &I2cImu::disableAccelCalibrationMode,this);
+	set_accel_cal_=nh_.advertiseService("set_accel_cal", &I2cImu::updateAccelCalibration,this);
+	enable_accel_cal_srv_=nh_.advertiseService("enable_accel_cal", &I2cImu::enableAccelCalibrationMode,this);
+
+	disable_compass_cal_srv_=nh_.advertiseService("disable_compass_cal", &I2cImu::disableCompassCalibrationMode,this);
+	set_compass_cal_=nh_.advertiseService("set_compass_cal", &I2cImu::updateCompassCalibration,this);
+	enable_compass_cal_srv_=nh_.advertiseService("enable_compass_cal", &I2cImu::enableCompassCalibrationMode,this);
+
+
 
 	bool magnetometer;
 	private_nh_.param("publish_magnetometer", magnetometer, false);
@@ -320,6 +365,45 @@ void I2cImu::spin()
 		ros::spinOnce();
 		r.sleep();
 	}
+}
+
+bool I2cImu::updateAccelCalibration(i2c_imu::SetCalibration::Request &req,
+		                            i2c_imu::SetCalibrationResponse &resp)
+{
+	imu_settings_.updateMinMaxAccelCalibration(req.min,req.max);
+	imu_->resetFusion();
+	return true;
+}
+
+bool I2cImu::updateCompassCalibration(i2c_imu::SetCalibration::Request &req,
+									  i2c_imu::SetCalibrationResponse &resp)
+{
+	imu_settings_.updateMinMaxCompassCalibration(req.min,req.max);
+	return true;
+}
+
+bool I2cImu::disableCompassCalibrationMode(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp)
+{
+	imu_->setCompassCalibrationMode(false);
+	return true;
+}
+
+bool I2cImu::disableAccelCalibrationMode(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp)
+{
+	imu_->setAccelCalibrationMode(false);
+	return true;
+}
+
+bool I2cImu::enableCompassCalibrationMode(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp)
+{
+	imu_->setCompassCalibrationMode(true);
+	return true;
+}
+
+bool I2cImu::enableAccelCalibrationMode(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp)
+{
+	imu_->setAccelCalibrationMode(true);
+	return true;
 }
 
 
