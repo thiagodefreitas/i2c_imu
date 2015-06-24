@@ -121,8 +121,6 @@ I2cImu::I2cImu() :
 	set_compass_cal_=nh_.advertiseService("set_compass_cal", &I2cImu::updateCompassCalibration,this);
 	enable_compass_cal_srv_=nh_.advertiseService("enable_compass_cal", &I2cImu::enableCompassCalibrationMode,this);
 
-
-
 	bool magnetometer;
 	private_nh_.param("publish_magnetometer", magnetometer, false);
 	if (magnetometer)
@@ -370,6 +368,7 @@ void I2cImu::spin()
 bool I2cImu::updateAccelCalibration(i2c_imu::SetCalibration::Request &req,
 		                            i2c_imu::SetCalibrationResponse &resp)
 {
+	ROS_INFO("Update Accelerometer Calibration");
 	imu_settings_.updateMinMaxAccelCalibration(req.min,req.max);
 	imu_->setCalibrationData();
 	return true;
@@ -378,6 +377,7 @@ bool I2cImu::updateAccelCalibration(i2c_imu::SetCalibration::Request &req,
 bool I2cImu::updateCompassCalibration(i2c_imu::SetCalibration::Request &req,
 									  i2c_imu::SetCalibrationResponse &resp)
 {
+	ROS_INFO("Update Compass Calibration");
 	imu_settings_.updateMinMaxCompassCalibration(req.min,req.max);
 	imu_->setCalibrationData();
 	return true;
@@ -385,24 +385,28 @@ bool I2cImu::updateCompassCalibration(i2c_imu::SetCalibration::Request &req,
 
 bool I2cImu::disableCompassCalibrationMode(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp)
 {
+	ROS_INFO("Disable Compass Calibration Mode");
 	imu_->setCompassCalibrationMode(false);
 	return true;
 }
 
 bool I2cImu::disableAccelCalibrationMode(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp)
 {
+	ROS_INFO("Disable Accelerometer Calibration Mode");
 	imu_->setAccelCalibrationMode(false);
 	return true;
 }
 
 bool I2cImu::enableCompassCalibrationMode(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp)
 {
+	ROS_INFO("Enable Compass Calibration Mode");
 	imu_->setCompassCalibrationMode(true);
 	return true;
 }
 
 bool I2cImu::enableAccelCalibrationMode(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp)
 {
+	ROS_INFO("Enable Accelerometer Calibration Mode");
 	imu_->setAccelCalibrationMode(true);
 	return true;
 }
