@@ -57,6 +57,8 @@ private:
 
 	ros::Publisher imu_pub_;
 	ros::Publisher magnetometer_pub_;
+	ros::Publisher magnetometer_pub_raw_;
+
 	ros::Publisher euler_pub_;
 
 	ros::ServiceServer disable_accel_cal_srv_;
@@ -126,6 +128,7 @@ I2cImu::I2cImu() :
 	if (magnetometer)
 	{
 		magnetometer_pub_ = nh_.advertise<sensor_msgs::MagneticField>("mag", 10, false);
+		magnetometer_pub_raw_ = nh_.advertise<sensor_msgs::MagneticField>("mag_raw", 10, false);
 	}
 
 	bool euler;
@@ -193,6 +196,7 @@ void I2cImu::update()
 	{
 		RTIMU_DATA imuData = imu_->getIMUData();
 
+
 		ros::Time current_time = ros::Time::now();
 
 
@@ -216,6 +220,8 @@ void I2cImu::update()
 		if (magnetometer_pub_ != NULL && imuData.compassValid)
 		{
 			sensor_msgs::MagneticField msg;
+			RTVector3 compassRaw = imu_->getCompassRawData();
+			sensor_msgs::MagneticField msg_raw;
 
 			msg.header.frame_id=imu_frame_id_;
 			msg.header.stamp=ros::Time::now();
@@ -224,7 +230,12 @@ void I2cImu::update()
 			msg.magnetic_field.y = imuData.compass.y()/uT_2_T;
 			msg.magnetic_field.z = imuData.compass.z()/uT_2_T;
 
+			msg_raw.magnetic_field.x = compassRaw.x()/uT_2_T;
+			msg_raw.magnetic_field.y = compassRaw.y()/uT_2_T;
+			msg_raw.magnetic_field.z = compassRaw.z()/uT_2_T;
+
 			magnetometer_pub_.publish(msg);
+			magnetometer_pub_raw_.publish(msg_raw);
 		}
 
 		if (euler_pub_ != NULL)
