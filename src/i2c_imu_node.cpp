@@ -25,6 +25,7 @@
 #include <i2c_imu/SetCalibration.h>
 #include <std_srvs/Empty.h>
 
+
 #include "RTIMULib.h"
 #include "RTIMUSettings.h"
 
@@ -52,8 +53,6 @@ private:
 	ros::NodeHandle private_nh_;
 	// sensor msg topic output
 	sensor_msgs::Imu imu_msg;
-
-	tf::TransformBroadcaster tf_broadcaster_;
 
 	ros::Publisher imu_pub_;
 	ros::Publisher magnetometer_pub_;
@@ -217,25 +216,28 @@ void I2cImu::update()
 
 		imu_pub_.publish(imu_msg);
 
-		if (magnetometer_pub_ != NULL && imuData.compassValid)
+		if (magnetometer_pub_ != NULL )
 		{
-			sensor_msgs::MagneticField msg;
-			RTVector3 compassRaw = imu_->getCompassRawData();
-			sensor_msgs::MagneticField msg_raw;
+				RTVector3 compassRaw = imu_->getCompassRawData();
+				sensor_msgs::MagneticField msg_raw;
 
-			msg.header.frame_id=imu_frame_id_;
-			msg.header.stamp=ros::Time::now();
+				msg_raw.header.frame_id=imu_frame_id_;
+				msg_raw.header.stamp=ros::Time::now();
 
-			msg.magnetic_field.x = imuData.compass.x()/uT_2_T;
-			msg.magnetic_field.y = imuData.compass.y()/uT_2_T;
-			msg.magnetic_field.z = imuData.compass.z()/uT_2_T;
+				msg_raw.magnetic_field.x = compassRaw.x()/uT_2_T;
+				msg_raw.magnetic_field.y = compassRaw.y()/uT_2_T;
+				msg_raw.magnetic_field.z = compassRaw.z()/uT_2_T;
 
-			msg_raw.magnetic_field.x = compassRaw.x()/uT_2_T;
-			msg_raw.magnetic_field.y = compassRaw.y()/uT_2_T;
-			msg_raw.magnetic_field.z = compassRaw.z()/uT_2_T;
+				magnetometer_pub_raw_.publish(msg_raw);
 
-			magnetometer_pub_.publish(msg);
-			magnetometer_pub_raw_.publish(msg_raw);
+//			if(imuData.compassValid)
+//			{
+				sensor_msgs::MagneticField msg=msg_raw;
+				msg.magnetic_field.x = imuData.compass.x()/uT_2_T;
+				msg.magnetic_field.y = imuData.compass.y()/uT_2_T;
+				msg.magnetic_field.z = imuData.compass.z()/uT_2_T;
+				magnetometer_pub_.publish(msg);
+//			}
 		}
 
 		if (euler_pub_ != NULL)
