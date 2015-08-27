@@ -74,7 +74,7 @@ I2cImu::I2cImu() :
 {
 
 	// do all the ros parameter reading & pulbishing
-	private_nh_.param<std::string>("frame_id", imu_frame_id_, "imu_link");
+	private_nh_.param<std::string>("frame_id", imu_frame_id_, "imu0_link");
 
 	imu_pub_ = nh_.advertise<sensor_msgs::Imu>("data",10);
 
