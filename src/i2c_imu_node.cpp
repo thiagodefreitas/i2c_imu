@@ -70,7 +70,7 @@ private:
 };
 
 I2cImu::I2cImu() :
-    nh_(), private_nh_("~"), imu_settings_(&private_nh_)
+  nh_(), private_nh_("~"), imu_settings_(&private_nh_)
 {
 
   // do all the ros parameter reading & pulbishing
@@ -136,10 +136,10 @@ I2cImu::I2cImu() :
     ROS_BREAK();
   }
 
-        imu_->setSlerpPower(0.02);
-        imu_->setGyroEnable(true);
-        imu_->setAccelEnable(true);
-        imu_->setCompassEnable(true);
+  imu_->setSlerpPower(0.02);
+  imu_->setGyroEnable(true);
+  imu_->setAccelEnable(true);
+  imu_->setCompassEnable(true);
 
 }
 
@@ -153,20 +153,20 @@ void I2cImu::update()
     ros::Time current_time = ros::Time::now();
 
 
-		imu_msg.header.stamp = current_time;
-		imu_msg.header.frame_id = imu_frame_id_;
-		imu_msg.orientation.x = imuData.fusionQPose.x();
-		imu_msg.orientation.y = imuData.fusionQPose.y();
-		imu_msg.orientation.z = imuData.fusionQPose.z();
-		imu_msg.orientation.w = imuData.fusionQPose.scalar();
+    imu_msg.header.stamp = current_time;
+    imu_msg.header.frame_id = imu_frame_id_;
+    imu_msg.orientation.x = imuData.fusionQPose.x();
+    imu_msg.orientation.y = imuData.fusionQPose.y();
+    imu_msg.orientation.z = imuData.fusionQPose.z();
+    imu_msg.orientation.w = imuData.fusionQPose.scalar();
 
-		imu_msg.angular_velocity.x = imuData.gyro.x();
-		imu_msg.angular_velocity.y = imuData.gyro.y();
-		imu_msg.angular_velocity.z = imuData.gyro.z();
+    imu_msg.angular_velocity.x = imuData.gyro.x();
+    imu_msg.angular_velocity.y = imuData.gyro.y();
+    imu_msg.angular_velocity.z = imuData.gyro.z();
 
-		imu_msg.linear_acceleration.x = imuData.accel.x() * G_2_MPSS;
-		imu_msg.linear_acceleration.y = imuData.accel.y() * G_2_MPSS;
-		imu_msg.linear_acceleration.z = imuData.accel.z() * G_2_MPSS;
+    imu_msg.linear_acceleration.x = imuData.accel.x() * G_2_MPSS;
+    imu_msg.linear_acceleration.y = imuData.accel.y() * G_2_MPSS;
+    imu_msg.linear_acceleration.z = imuData.accel.z() * G_2_MPSS;
 
     imu_pub_.publish(imu_msg);
 
@@ -177,23 +177,23 @@ void I2cImu::update()
       msg.header.frame_id=imu_frame_id_;
       msg.header.stamp=ros::Time::now();
 
-			msg.magnetic_field.x = imuData.compass.x()/uT_2_T;
-			msg.magnetic_field.y = imuData.compass.y()/uT_2_T;
-			msg.magnetic_field.z = imuData.compass.z()/uT_2_T;
+      msg.magnetic_field.x = imuData.compass.x()/uT_2_T;
+      msg.magnetic_field.y = imuData.compass.y()/uT_2_T;
+      msg.magnetic_field.z = imuData.compass.z()/uT_2_T;
 
       magnetometer_pub_.publish(msg);
     }
 
-		if (euler_pub_ != NULL)
-		{
-			geometry_msgs::Vector3 msg;
-			msg.x = imuData.fusionPose.x();
-			msg.y = imuData.fusionPose.y();
-			msg.z = -imuData.fusionPose.z();
-			msg.z = (-imuData.fusionPose.z()) - declination_radians_;
-			euler_pub_.publish(msg);
-		}
-	}
+    if (euler_pub_ != NULL)
+    {
+      geometry_msgs::Vector3 msg;
+      msg.x = imuData.fusionPose.x();
+      msg.y = imuData.fusionPose.y();
+      msg.z = -imuData.fusionPose.z();
+      msg.z = (-imuData.fusionPose.z()) - declination_radians_;
+      euler_pub_.publish(msg);
+    }
+  }
 
 }
 
@@ -210,13 +210,13 @@ bool I2cImu::ImuSettings::loadSettings()
     m_I2CBus = (unsigned char) temp_int;
 
   if(settings_nh_->getParam("i2c_slave_address", temp_int))
-      m_I2CSlaveAddress = (unsigned char) temp_int;
+    m_I2CSlaveAddress = (unsigned char) temp_int;
 
-	settings_nh_->getParam("axis_rotation", m_axisRotation);
-	
-	//double declination_radians;
-	//settings_nh_->param("magnetic_declination", declination_radians, 0.0);
-	//m_compassAdjDeclination = angles::to_degrees(declination_radians);
+  settings_nh_->getParam("axis_rotation", m_axisRotation);
+
+  //double declination_radians;
+  //settings_nh_->param("magnetic_declination", declination_radians, 0.0);
+  //m_compassAdjDeclination = angles::to_degrees(declination_radians);
 
   //MPU9150
   settings_nh_->getParam("mpu9150/gyro_accel_sample_rate", m_MPU9150GyroAccelSampleRate);
@@ -288,7 +288,7 @@ bool I2cImu::ImuSettings::loadSettings()
   }
   else
   {
-      ROS_INFO("No Calibration for Compass");
+    ROS_INFO("No Calibration for Compass");
   }
 
   std::vector<double> accel_max, accel_min;
@@ -304,7 +304,7 @@ bool I2cImu::ImuSettings::loadSettings()
   }
   else
   {
-      ROS_INFO("No Calibration for Accelerometer");
+    ROS_INFO("No Calibration for Accelerometer");
   }
 
 
